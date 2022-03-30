@@ -5,7 +5,7 @@
 #include "OneButton.h"
 #include <Arduino.h>
 #include "DriverStepMotor.h"
-TFT_eSPI tft = TFT_eSPI(); // Invoke library, pins defined in User_Setup.h
+ TFT_eSPI tft = TFT_eSPI(); // Invoke library, pins defined in User_Setup.h
 StepMotorControl SMC(19200);
 int data[5]={0};
 #pragma region 线程创建
@@ -101,14 +101,22 @@ void start_task(void *pvParameters)
 //显示线程
 void ShowThread(void *pvParameters)
 {
+  std::array<float, ROBOTArm> Angel = {0};
+  std::array<float, ROBOTArm> Angelac = {0};
+  double saaa;
+  int DataTwo[2]={0};
+  int DataPara[4]={0};
 	while(1)
 	{
-        SMC.GetActualAngel();
-        tft.drawNumber(SMC.Getdata[0][1],20,30);
-        tft.drawNumber(SMC.Getdata[0][2],20,50);
-        tft.drawNumber(SMC.Getdata[0][3],20,70);
-        vTaskDelay(100);			//延时500ms
-        tft.drawNumber(data[4],50,60);
+        tft.drawFloat(10.2,2,50,60);
+        taskENTER_CRITICAL();           //进入临界区
+        Angel=SMC.GetActualMoveAngel();
+        //Angelac=SMC.GetActualAngel();
+        taskEXIT_CRITICAL();      //退出临界区    此段代码不可以被打断    
+        tft.drawFloat(Angelac[0],2,20,50);
+      tft.drawFloat(Angel[0],2,20,70);
+      vTaskDelay(100);			//延时500ms
+        
 	}
 }
 //控制线程
@@ -117,6 +125,7 @@ void ConturlThread(void *pvParameters)
   
 	while(1)
 	{
+     tft.drawNumber(20,80,70);
      
      vTaskDelay(15);			//延时500ms
 	}
