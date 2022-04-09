@@ -16,6 +16,7 @@
 #define SixTeen3 4096
 #define SixTeen4 65536
 #define SixTeen5 1048576
+#define MaxSpeed 127
 class StepMotorControl
 {
     
@@ -30,7 +31,7 @@ class StepMotorControl
     std::array<char, 6> GetMotorStall();            //获取电机堵转标准位
     std::array<float, 6> GetMotorCurrent();       //获取电机电流
 
-
+    void initss();
     bool SetMotorSubdivision();                //设置电机细分指令
     bool MotorEnOn(bool EN[6]);                //使能驱动板
     bool MotorEnOff(bool EN[6]);                //关闭驱动板

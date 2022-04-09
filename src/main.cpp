@@ -5,7 +5,7 @@
 #include "OneButton.h"
 #include <Arduino.h>
 #include "DriverStepMotor.h"
- TFT_eSPI tft = TFT_eSPI(); // Invoke library, pins defined in User_Setup.h
+ //TFT_eSPI tft = TFT_eSPI(); // Invoke library, pins defined in User_Setup.h
 StepMotorControl SMC(19200);
 int data[5]={0};
 #pragma region 线程创建
@@ -31,7 +31,7 @@ QueueHandle_t Positionqueue;
 #pragma region 按键定义并初始化
 #define KEY1 PC13 //按键1
 #define KEY2 PC14 //按键2
-#define KEY3 A4 //按键3
+#define KEY3 PB9 //按键3
 OneButton button1(KEY1, true);
 OneButton button2(KEY2, true);
 OneButton button3(KEY3, true);
@@ -42,10 +42,11 @@ void ClickCenter();
 
  void setup(void) {
   pinMode(PA0,OUTPUT);
-  tft.init();
-  tft.setRotation(0);
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  SMC.initss();
+  // tft.init();
+  // tft.setRotation(0);
+  // tft.fillScreen(TFT_BLACK);
+  // tft.setTextColor(TFT_GREEN, TFT_BLACK);
   button1.attachClick(ClickRight);
   button2.attachClick(ClickLeft);
   button3.attachClick(ClickCenter);
@@ -108,24 +109,25 @@ void ShowThread(void *pvParameters)
   int DataPara[4]={0};
 	while(1)
 	{
-        tft.drawFloat(10.2,2,50,60);
+        //tft.drawFloat(10.2,2,50,60);
         taskENTER_CRITICAL();           //进入临界区
         Angel=SMC.GetActualMoveAngel();
+        vTaskDelay(100);			//延时500ms
         //Angelac=SMC.GetActualAngel();
         taskEXIT_CRITICAL();      //退出临界区    此段代码不可以被打断    
-        tft.drawFloat(Angelac[0],2,20,50);
-      tft.drawFloat(Angel[0],2,20,70);
-      vTaskDelay(100);			//延时500ms
+        //tft.drawFloat(Angelac[0],2,20,50);
+      //tft.drawFloat(Angel[0],2,20,70);
+      
         
 	}
 }
 //控制线程
 void ConturlThread(void *pvParameters)
 {
-  
+ 
 	while(1)
 	{
-     tft.drawNumber(20,80,70);
+     //tft.drawNumber(20,80,70);
      
      vTaskDelay(15);			//延时500ms
 	}
@@ -145,16 +147,26 @@ void CommunicationThread(void *pvParameters)
 void ClickRight()
 {
     //mservo.set_angle(1,90,100);
-    digitalWrite(PA0,LOW);
+    float Angelac1[6] = {60,60,60,60,60,60};
+    float Speed[6] = {20,20,20,20,20,20};
+
+    SMC.MovePosition(Angelac1,Speed);
+    //tft.drawFloat(0.4,2,70,110);
     
 }
 void ClickLeft()
 {
   static int as=10;
+  //tft.drawFloat(0.2,2,110,50);
 }
 void ClickCenter()
 {
-  
+   float Angelac1[6] = {-50,60,60,60,60,60};
+    float Speed[6] = {80,20,20,20,20,20};
+    
+   SMC.MovePosition(Angelac1,Speed);
+    //SMC.SetMotorSubdivision();
+  //tft.drawFloat(0.2,2,110,80);
 }
 
 
