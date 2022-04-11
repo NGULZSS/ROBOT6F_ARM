@@ -40,6 +40,8 @@ void ClickLeft();
 void ClickCenter();
 #pragma endregion
 
+
+bool flag=false;
  void setup(void) {
   pinMode(PA0,OUTPUT);
   SMC.initss();
@@ -104,19 +106,19 @@ void ShowThread(void *pvParameters)
 {
   std::array<float, ROBOTArm> Angel = {0};
   std::array<float, ROBOTArm> Angelac = {0};
+  std::array<float, 6> error={0};
   double saaa;
   int DataTwo[2]={0};
   int DataPara[4]={0};
+   //Angelac=SMC.GetActualAngel();   
 	while(1)
 	{
         //tft.drawFloat(10.2,2,50,60);
         taskENTER_CRITICAL();           //进入临界区
-        Angel=SMC.GetActualMoveAngel();
-        vTaskDelay(100);			//延时500ms
-        //Angelac=SMC.GetActualAngel();
-        taskEXIT_CRITICAL();      //退出临界区    此段代码不可以被打断    
-        //tft.drawFloat(Angelac[0],2,20,50);
-      //tft.drawFloat(Angel[0],2,20,70);
+        //Angel=SMC.GetActualMoveAngel();
+        taskEXIT_CRITICAL();      //退出临界区    此段代码不可以被打断
+         vTaskDelay(100);			//延时500ms
+        //tft.drawFloat(Angel[0],2,20,70);
       
         
 	}
@@ -124,12 +126,28 @@ void ShowThread(void *pvParameters)
 //控制线程
 void ConturlThread(void *pvParameters)
 {
- 
+  std::array<float, ROBOTArm> Angelac = {0};
+  float Angelac1[6] = {360,60,60,60,60,60};
+    //float Speed[6] = {20,20,20,20,20,20};
+    std::array<float, ROBOTArm> Speed = {-120,20,20,20,20,20};
+    double count=0;
 	while(1)
 	{
-     //tft.drawNumber(20,80,70);
-     
+     //Angelac=SMC.GetActualAngel();   
+     if(flag==true)
+     {
+        //SMC.MovePositionloop(Angelac1,Speed);
+        Speed[0]=-60*sin(count*PI/180)+-60;
+        SMC.MotorRunSpeed(Speed);
+        count++;
+        if(count==360)
+        {
+          count=0;
+        }
+
+     }
      vTaskDelay(15);			//延时500ms
+     //tft.drawFloat(Angelac[0],2,20,50);
 	}
 }
 //通信线程
@@ -148,11 +166,12 @@ void ClickRight()
 {
     //mservo.set_angle(1,90,100);
     float Angelac1[6] = {60,60,60,60,60,60};
-    float Speed[6] = {20,20,20,20,20,20};
-
+    float Speed[6] = {100,20,20,20,20,20};
+    std::array<float, ROBOTArm> Angel = {0};
     SMC.MovePosition(Angelac1,Speed);
     //tft.drawFloat(0.4,2,70,110);
-    
+    // Angel=SMC.GetActualMoveAngel();
+    // tft.drawFloat(Angel[0],2,20,70);
 }
 void ClickLeft()
 {
@@ -161,11 +180,15 @@ void ClickLeft()
 }
 void ClickCenter()
 {
-   float Angelac1[6] = {-50,60,60,60,60,60};
-    float Speed[6] = {80,20,20,20,20,20};
-    
-   SMC.MovePosition(Angelac1,Speed);
-    //SMC.SetMotorSubdivision();
+  float Angelac1[6] = {-50,60,60,60,60,60};
+  std::array<float, ROBOTArm> Speed = {-120,20,20,20,20,20};
+   //SMC.MovePosition(Angelac1,Speed);
+   //SMC.MotorRunSpeed(Speed);
+  flag=true;
+  //   std::array<float, ROBOTArm> Angelac = {0};
+  //  Angelac=SMC.GetActualAngel();  
+  //  tft.drawFloat(Angelac[0],2,20,50); 
+  //SMC.SetMotorSubdivision();
   //tft.drawFloat(0.2,2,110,80);
 }
 

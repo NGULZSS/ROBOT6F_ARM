@@ -17,6 +17,11 @@
 #define SixTeen4 65536
 #define SixTeen5 1048576
 #define MaxSpeed 127
+#define PosationAccaracy 0.01
+#define StepTime 0.01
+#define SumMAX 20
+#define SumMAX 20
+
 class StepMotorControl
 {
     
@@ -32,16 +37,15 @@ class StepMotorControl
     std::array<float, 6> GetMotorCurrent();       //获取电机电流
 
     void initss();
-    bool SetMotorSubdivision();                //设置电机细分指令
-    bool MotorEnOn(bool EN[6]);                //使能驱动板
-    bool MotorEnOff(bool EN[6]);                //关闭驱动板
-    bool MotorRunSpeed(float speed[6]);        //电机速度驱动
-    bool StopMotorSpeed(float speed[6]);        //电机速度驱动
-    bool StopMotorRunSpeed(bool Stop[6]);       //停止电机速度驱动
+    bool SetMotorSubdivision(char FineFraction);                //设置电机细分指令
+    bool MotorEnOnOrOff(bool EN[6]);                //使能或者关闭驱动板
+    bool MotorRunSpeed(std::array<float, 6> speed);        //电机速度驱动
+    
+    bool StopMotorSpeed(int NumMotor);        //停止电机正反转
     bool SaveSpeed();                            //保存电机速度
     bool ClearSpeed();                            //清除电机速度
     bool MovePosition(float location[6],float speed[6]);   //电机位置控制  
-    
+    bool MovePositionloop(float location[6],float speed[6]);   //电机闭环位置控制  
     int Getdata[6][5] =   {{0xe0, 0, 0, 0,0},
                           {0xe1, 0, 0, 0,0},
                           {0xe2, 0, 0, 0,0},
@@ -49,6 +53,9 @@ class StepMotorControl
                           {0xe4, 0, 0, 0,0},
                           {0xe5, 0, 0, 0,0}};
     private:
+    float MP=2;
+    float MI=0.2;
+    float MD=0;
     int Subdivision=16;
     int Sentdata[6][5] = {{0xe0, 0, 0, 0,0},
                           {0xe1, 0, 0, 0,0},
@@ -57,12 +64,12 @@ class StepMotorControl
                           {0xe4, 0, 0, 0,0},
                           {0xe5, 0, 0, 0,0}};
 
-    // int Getdata[6][5] =   {{0xe0, 0, 0, 0,0},
-    //                       {0xe1, 0, 0, 0,0},
-    //                       {0xe2, 0, 0, 0,0},
-    //                       {0xe3, 0, 0, 0,0},
-    //                       {0xe4, 0, 0, 0,0},
-    //                       {0xe5, 0, 0, 0,0}};
+    int Getdatas[6][5] =   {{0xe0, 0, 0, 0,0},
+                          {0xe1, 0, 0, 0,0},
+                          {0xe2, 0, 0, 0,0},
+                          {0xe3, 0, 0, 0,0},
+                          {0xe4, 0, 0, 0,0},
+                          {0xe5, 0, 0, 0,0}};
     
 };
 
